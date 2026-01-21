@@ -6,11 +6,11 @@ from decision.matriz_decision import calcular_score
 # 5️⃣ Definir pesos de la matriz de decisión
 # -----------------------------
 pesos = {
-    "precio": 0.20,
+    "precio": 0.10,
     "consumo": 0.20,
     "potencia": 0.20,
     "etiqueta": 0.10,
-    "fiabilidad": 0.30,
+    "fiabilidad": 0.40,
     
 }
 
@@ -110,10 +110,12 @@ print(f"🚗 Coches listos para evaluación: {len(df)}")
 # 6️⃣ Calcular score y ordenar
 # -----------------------------
 resultado = calcular_score(df, pesos,ETIQUETAS, precio_objetivo, porc_mas_precio_objetivo)
+resultado = resultado.sort_values("score", ascending=False).reset_index(drop=True)
+resultado.index += 1  # ahora empieza en 1
 columnas_mostrar = [
     "nombre",
-    # "marca",
-    # "modelo",
+    "marca",
+    "modelo",
     "precio",
     "etiqueta",
     "fiabilidad",
@@ -123,3 +125,7 @@ columnas_mostrar = [
 
 print("🏆 Ranking coches nuevos según tus criterios:")
 print(resultado[columnas_mostrar].head(50))
+
+# 💾 Guardar en CSV
+resultado[columnas_mostrar].to_csv("data/ranking_coches.csv", index=True, index_label="ranking",encoding="utf-8")
+print("✅ CSV guardado en data/ranking_coches_nuevos.csv")
