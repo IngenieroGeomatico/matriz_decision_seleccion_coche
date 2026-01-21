@@ -86,9 +86,9 @@ print(f"🚗 Coches listos para evaluación: {len(df)}")
 # 5️⃣ Definir pesos de la matriz de decisión
 # -----------------------------
 pesos = {
-    "precio": 0.30,
+    "precio": 0.20,
     "consumo": 0.20,
-    "potencia": 0.10,
+    "potencia": 0.20,
     "etiqueta": 0.10,
     "fiabilidad": 0.30,
     

@@ -10,12 +10,13 @@ Proyecto para ayudar a elegir un coche mediante una matriz de decisión basada e
 **Requisitos:**
 - **Python:**: 3.8+
 - **Dependencias:**: Instalar con `pip install -r requirements.txt`.
+- **Recomendaciones:**: Instalar en entorno virtual `python3 -m venv .venv & source .venv/bin/activate`.
 
 **Instalación rápida:**
 ```bash
 git clone <repo>
 cd matriz_decision_seleccion_coche
-python3 -m pip install --upgrade pip
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
