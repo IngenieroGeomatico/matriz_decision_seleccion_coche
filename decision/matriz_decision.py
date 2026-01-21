@@ -51,7 +51,7 @@ def calcular_score(df, pesos, ETIQUETAS, precio_objetivo=20000, porc_mas_precio_
     df_norm["consumo"] = normalizar(df["consumo"], minimizar=True)
     df_norm["potencia"] = normalizar(df["potencia"], minimizar=False)
     df_norm["fiabilidad"] = normalizar(df["fiabilidad"], minimizar=False)
-    df_norm["etiqueta"] = df["etiqueta_score"].astype(float)
+    df_norm["etiqueta"] = normalizar(df["etiqueta_score"].astype(float) , minimizar=False)
 
     # Score final ponderado (multiplica cada columna por su peso y suma por fila)
     pesos_series = pd.Series(pesos)

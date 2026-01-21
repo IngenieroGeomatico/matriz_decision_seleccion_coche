@@ -1,7 +1,30 @@
 import pandas as pd
 from api.valor_mercado import obtener_valor_mercado_todos
 from decision.matriz_decision import calcular_score
-from api.coches_nuevos import obtener_coches_nuevos
+
+# -----------------------------
+# 5️⃣ Definir pesos de la matriz de decisión
+# -----------------------------
+pesos = {
+    "precio": 0.20,
+    "consumo": 0.20,
+    "potencia": 0.20,
+    "etiqueta": 0.10,
+    "fiabilidad": 0.30,
+    
+}
+
+ETIQUETAS = {
+    "B": 0.1,
+    "C": 0.2,
+    "ECO": 0.50,
+    "0": 1.00,
+    "0 emisiones": 1.00
+}
+
+precio_objetivo=20000
+porc_mas_precio_objetivo = 1.5
+
 
 # -----------------------------
 # Configuración: origen de las especificaciones
@@ -72,7 +95,7 @@ for coche in precios_dict:
         "potencia": precio.get("potencia"),
         "consumo": precio.get("consumo"),
         "anio": precio.get("anio"),
-        "etiqueta_medioambiental": precio.get("etiqueta_medioambiental"),
+        "etiqueta": precio.get("etiqueta_medioambiental"),
         "fiabilidad": fiabilidad_dict.get(marca_lower, 0.6)
     })
 
@@ -82,28 +105,6 @@ for coche in precios_dict:
 df = pd.DataFrame(dataset)
 print(f"🚗 Coches listos para evaluación: {len(df)}")
 
-# -----------------------------
-# 5️⃣ Definir pesos de la matriz de decisión
-# -----------------------------
-pesos = {
-    "precio": 0.20,
-    "consumo": 0.20,
-    "potencia": 0.20,
-    "etiqueta": 0.10,
-    "fiabilidad": 0.30,
-    
-}
-
-ETIQUETAS = {
-    "B": 0.1,
-    "C": 0.2,
-    "ECO": 0.50,
-    "0": 1.00,
-    "0 emisiones": 1.00
-}
-
-precio_objetivo=20000
-porc_mas_precio_objetivo = 1.5
 
 # -----------------------------
 # 6️⃣ Calcular score y ordenar
@@ -111,10 +112,10 @@ porc_mas_precio_objetivo = 1.5
 resultado = calcular_score(df, pesos,ETIQUETAS, precio_objetivo, porc_mas_precio_objetivo)
 columnas_mostrar = [
     "nombre",
-    "marca",
-    "modelo",
+    # "marca",
+    # "modelo",
     "precio",
-    "etiqueta_medioambiental",
+    "etiqueta",
     "fiabilidad",
     "consumo",
     "score"
