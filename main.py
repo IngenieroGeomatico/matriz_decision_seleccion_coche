@@ -5,7 +5,7 @@ TIPO = "ciudaddelautomovil"  # 'ciudaddelautomovil' o 'quecochemecompro'
 USAR_CSV_QUECOCHEMECOMPRO = True
 CSV_QUECOCHEMECOMPRO_PATH = "data/coches_quecochemecompro.csv"
 USAR_CSV_CIUDADDELAUTOMOVIL = True
-CSV_CIUDADDELAUTOMOVIL_PATH = "data/coches_segunda_mano.csv"
+CSV_CIUDADDELAUTOMOVIL_PATH = "data/coches_ciudaddelautomovil.csv"
 fiabilidad_path="data/fiabilidad_marcas.csv"
 
 pesos_QUECOCHEMECOMPRO = {
