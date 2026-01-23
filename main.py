@@ -1,11 +1,11 @@
 from lib.main_tipo import run_tipo
 
-TIPO = "usados"  # 'nuevos' o 'usados'
+TIPO = "quecochemecompro"  # 'ciudaddelautomovil' o 'quecochemecompro'
 
-USAR_CSV_NUEVOS = True
-CSV_NUEVOS_PATH = "data/coches_quecochemecompro.csv"
-USAR_CSV_USADOS = True
-CSV_USADOS_PATH = "data/coches_segunda_mano.csv"
+USAR_CSV_QUECOCHEMECOMPRO = True
+CSV_QUECOCHEMECOMPRO_PATH = "data/coches_quecochemecompro.csv"
+USAR_CSV_CIUDADDELAUTOMOVIL = True
+CSV_CIUDADDELAUTOMOVIL_PATH = "data/coches_segunda_mano.csv"
 fiabilidad_path="data/fiabilidad_marcas.csv"
 
 pesos_nuevos = {
@@ -56,18 +56,18 @@ GARANTIA = {
     "No": 0.7
 }
 
-precio_objetivo = 10000
+precio_objetivo = 20000
 porc_mas_precio_objetivo = 1.5
 
-km_objetivo = 20000 * 3
+km_objetivo = 100000
 porc_km_objetivo = 1.5
 
 resultado = run_tipo(
     tipo=TIPO,
-    usar_csv_precios=USAR_CSV_NUEVOS,
-    csv_precios_path=CSV_NUEVOS_PATH,
-    usar_csv_usados=USAR_CSV_USADOS,
-    csv_usados_path=CSV_USADOS_PATH,
+    USAR_CSV_QUECOCHEMECOMPRO=USAR_CSV_QUECOCHEMECOMPRO,
+    CSV_QUECOCHEMECOMPRO_PATH=CSV_QUECOCHEMECOMPRO_PATH,
+    USAR_CSV_CIUDADDELAUTOMOVIL=USAR_CSV_CIUDADDELAUTOMOVIL,
+    CSV_CIUDADDELAUTOMOVIL_PATH=CSV_CIUDADDELAUTOMOVIL_PATH,
     fiabilidad_path=fiabilidad_path,
     pesos_nuevos=pesos_nuevos,
     pesos_usados=pesos_usados,

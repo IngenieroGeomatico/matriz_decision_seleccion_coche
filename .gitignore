@@ -208,6 +208,6 @@ __marimo__/
 
 # Archivos propios
 data/coches_quecochemecompro.csv
-data/ranking_coches_nuevos.csv
+data/ranking_coches_quecochemecompro.csv
 data/coches_segunda_mano.csv
-data/ranking_coches_usados.csv
+data/ranking_coches_ciudaddelautomovil.csv

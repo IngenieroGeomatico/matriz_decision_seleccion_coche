@@ -79,7 +79,7 @@ def mapear_categorico(df, columna, mapping, default=0.5):
 # Score principal
 # --------------------------------------------------
 
-def calcular_score_usados(
+def calcular_score_ciudaddelautomovil(
     df,
     pesos,
     COMBUSTIBLE_SCORE,

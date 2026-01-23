@@ -10,25 +10,11 @@ import time
 import unicodedata
 import re
 
+from  api.api_request import robust_get, crear_session_robusta, generar_sleep, generar_user_agent
+
+
 # Lista de User-Agents para rotar
-
-USER_AGENTS = [
-    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13.5; rv:112.0) Gecko/20100101 Firefox/112.0",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36"
-]
-
-def generar_sleep(TIME_SLEEP_BASE = 1, max=0.5, min=-0.5):
-    time.sleep(TIME_SLEEP_BASE + random.uniform(min, max))
+USER_AGENTS = generar_user_agent()
 
 # Función para generar headers aleatorios
 def generar_headers():
@@ -47,22 +33,12 @@ def generar_headers():
 
 
 # Session con reintentos para evitar fallos por desconexiones temporales
-SESSION = requests.Session()
-RETRY_STRATEGY = Retry(
-    total=5,
-    backoff_factor=0.5,
-    status_forcelist=[429, 500, 502, 503, 504],
-    allowed_methods=["HEAD", "GET", "OPTIONS"],
-)
-ADAPTER = HTTPAdapter(max_retries=RETRY_STRATEGY)
-SESSION.mount("https://", ADAPTER)
-SESSION.mount("http://", ADAPTER)
-
+SESSION = crear_session_robusta()
 # ----------------------------
 # Función principal
 # ----------------------------
 
-def obtener_valor_segunda_mano_todos(fiabilidad_dict):
+def obtener_valor_ciudaddelautomovil(fiabilidad_dict):
 
     def obtener_marca_desde_fiabilidad(name, dict_fiabilidad):
 
@@ -102,14 +78,10 @@ def obtener_valor_segunda_mano_todos(fiabilidad_dict):
         
         generar_sleep()
         try:
-            r = SESSION.get(url_finder, headers=generar_headers(), timeout=60)
-            r.raise_for_status()
+            r = robust_get(session=SESSION, url=url_finder, headers=generar_headers(), timeout=60)
         except requests.RequestException as e:
             print(f"Error al obtener la página {page}: {e}")
-            r_r += 1
-            if r_r >= reintentos:
-                break
-            generar_sleep(TIME_SLEEP_BASE = 10, max=3, min=-0.5)
+            break
             
         soup = BeautifulSoup(r.text, "html.parser")
         # Buscar todas las tarjetas de coches (revisar clase real en el HTML)
@@ -137,14 +109,11 @@ def obtener_valor_segunda_mano_todos(fiabilidad_dict):
 
             generar_sleep()
             try:
-                r2 = SESSION.get(url_vehic, headers=generar_headers(), timeout=10)
-                r2.raise_for_status()
+                r2 = robust_get(session=SESSION, url=url_vehic, headers=generar_headers(), timeout=60)
             except requests.RequestException as e:
-                r_r2 += 1
                 print(f"Error {r_r2} al obtener la página {json_propiedades['name']}: {e}")
-                if r_r2 >= reintentos:
-                    break
-                generar_sleep(TIME_SLEEP_BASE = 10, max=3, min=-0.5)
+                break
+            
 
             soup2 = BeautifulSoup(r2.text, "html.parser")
             # Buscar todas las tarjetas de coches (revisar clase real en el HTML)
@@ -189,4 +158,4 @@ if __name__ == "__main__":
     fiabilidad_csv = pd.read_csv("data/fiabilidad_marcas.csv")
     # Diccionario con claves en minúsculas
     fiabilidad_dict = dict(zip(fiabilidad_csv.marca.str.lower(), fiabilidad_csv.fiabilidad))
-    obtener_valor_segunda_mano_todos(fiabilidad_dict)
+    obtener_valor_ciudaddelautomovil(fiabilidad_dict)

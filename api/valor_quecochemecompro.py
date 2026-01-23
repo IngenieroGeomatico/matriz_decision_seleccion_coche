@@ -6,25 +6,11 @@ from urllib.parse import quote
 import random
 import time
 
-# Lista de User-Agents para rotar
-TIME_SLEEP_BASE = 2
-USER_AGENTS = [
-    "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:147.0) Gecko/20100101 Firefox/147.0",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 13.5; rv:112.0) Gecko/20100101 Firefox/112.0",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0",
-    "Mozilla/5.0 (Macintosh; Intel Mac OS X 14_6) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Safari/605.1.15",
-    "Mozilla/5.0 (iPhone; CPU iPhone OS 18_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0",
-    "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Mobile Safari/537.36"
-]
+from  api.api_request import robust_get, crear_session_robusta, generar_sleep, generar_user_agent
 
-def generar_sleep(max=1, min=-0.5):
-    time.sleep(TIME_SLEEP_BASE + random.uniform(min, max))
+# Lista de User-Agents para rotar
+USER_AGENTS = generar_user_agent()
+
 
 # Función para generar headers aleatorios
 def generar_headers():
@@ -40,20 +26,27 @@ def generar_headers():
 
     }
 
+# Session con reintentos para evitar fallos por desconexiones temporales
+SESSION = crear_session_robusta()
+
 # ----------------------------
 # Función principal
 # ----------------------------
 
 
-def obtener_valor_mercado_todos():
+def obtener_valor_mercado_quecochemecompro():
     resultados = []
 
     page = 1
     while True:
+
         url_finder = f"https://www.quecochemecompro.com/components/finder/?page={page}&search_type=vn&per_page=30&is_embed=false&is_stock=true"
-        r = requests.get(url_finder, headers=generar_headers())
-        if r.status_code != 200:
-            print(f"Error al obtener la página {page}")
+
+        generar_sleep()
+        try:
+            r = robust_get(session=SESSION, url=url_finder, headers=generar_headers(), timeout=60)
+        except requests.RequestException as e:
+            print(f"Error al obtener la página {page}: {e}")
             break
 
         soup = BeautifulSoup(r.text, "html.parser")
@@ -82,10 +75,14 @@ def obtener_valor_mercado_todos():
             # ----------------------
             v_page = 1
             while True:
+                generar_sleep()
                 try:
+
                     url_versions = f"https://www.quecochemecompro.com/components/versions_table/?page={v_page}&slug={quote(slug)}&search_type=vn&per_page=30"
-                    r_v = requests.get(url_versions, headers=generar_headers())
-                    if r_v.status_code != 200:
+
+                    try:
+                        r_v = robust_get(session=SESSION, url=url_versions, headers=generar_headers(), timeout=60)
+                    except requests.RequestException as e:
                         print(f"Error en versiones de {slug} página {v_page}")
                         break
 

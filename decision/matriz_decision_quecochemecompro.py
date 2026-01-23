@@ -35,7 +35,7 @@ def normalizar_precio(col, precio_objetivo):
 
     return score.clip(lower=0)
 
-def calcular_score(df, pesos, ETIQUETAS, precio_objetivo=20000, porc_mas_precio_objetivo=1.5):
+def calcular_score_quecochemecompro(df, pesos, ETIQUETAS, precio_objetivo=20000, porc_mas_precio_objetivo=1.5):
     df = df.copy()
 
     # Etiqueta medioambiental → numérica
@@ -43,7 +43,7 @@ def calcular_score(df, pesos, ETIQUETAS, precio_objetivo=20000, porc_mas_precio_
 
     # ❌ DESCARTAR coches fuera de presupuesto o que su valor sea 0
     df = df[df["precio"] <= precio_objetivo * porc_mas_precio_objetivo]
-    df = df[df["precio"] >= 1000]
+    df = df[df["precio"] >= 10]
 
     df_norm = pd.DataFrame(index=df.index)
 
