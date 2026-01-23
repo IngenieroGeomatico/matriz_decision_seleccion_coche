@@ -8,7 +8,7 @@ USAR_CSV_CIUDADDELAUTOMOVIL = True
 CSV_CIUDADDELAUTOMOVIL_PATH = "data/coches_segunda_mano.csv"
 fiabilidad_path="data/fiabilidad_marcas.csv"
 
-pesos_nuevos = {
+pesos_QUECOCHEMECOMPRO = {
     "precio": 0.10,
     "consumo": 0.20,
     "potencia": 0.20,
@@ -16,7 +16,7 @@ pesos_nuevos = {
     "fiabilidad": 0.40,
 }
 
-pesos_usados = {
+pesos_CIUDADDELAUTOMOVIL = {
     "precio": 0.20,
     "kilometros": 0.10,
     "anio": 0.10,
@@ -69,8 +69,8 @@ resultado = run_tipo(
     USAR_CSV_CIUDADDELAUTOMOVIL=USAR_CSV_CIUDADDELAUTOMOVIL,
     CSV_CIUDADDELAUTOMOVIL_PATH=CSV_CIUDADDELAUTOMOVIL_PATH,
     fiabilidad_path=fiabilidad_path,
-    pesos_nuevos=pesos_nuevos,
-    pesos_usados=pesos_usados,
+    pesos_QUECOCHEMECOMPRO=pesos_QUECOCHEMECOMPRO,
+    pesos_CIUDADDELAUTOMOVIL=pesos_CIUDADDELAUTOMOVIL,
     ETIQUETAS=ETIQUETAS,
     COMBUSTIBLE_SCORE=COMBUSTIBLE_SCORE,
     CAMBIO_SCORE=CAMBIO_SCORE,
