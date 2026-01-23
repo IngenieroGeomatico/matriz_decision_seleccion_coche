@@ -1,39 +1,10 @@
 import pandas as pd
 
-def mapear_etiqueta(df, ETIQUETAS):
-    # Normaliza las claves de ETIQUETAS a mayúsculas para que coincidan
-    etiquetas_up = {str(k).upper(): v for k, v in ETIQUETAS.items()}
-    df["etiqueta_score"] = (
-        df["etiqueta_medioambiental"].astype(str)
-        .str.upper()
-        .map(etiquetas_up)
-        .fillna(0)
-    ).astype(float)
-    return df
-
-def normalizar(col, minimizar=True):
-    col = col.astype(float)
-    denom = col.max() - col.min()
-    if denom == 0 or pd.isna(denom):
-        # Si todos los valores son iguales, devolver una serie neutra (1.0)
-        return pd.Series(1.0, index=col.index)
-
-    if minimizar:
-        return (col.max() - col) / denom
-    else:
-        return (col - col.min()) / denom
-    
-def normalizar_precio(col, precio_objetivo):
-    """
-    1.0 si precio <= objetivo
-    Penaliza progresivamente si lo supera
-    """
-    col = col.astype(float)
-
-    score = 1 - (col - precio_objetivo) / precio_objetivo
-    score[col <= precio_objetivo] = 1.0
-
-    return score.clip(lower=0)
+from .matriz_general import (
+    mapear_etiqueta,
+    normalizar,
+    normalizar_precio,
+)
 
 def calcular_score_quecochemecompro(df, pesos, ETIQUETAS, precio_objetivo=20000, porc_mas_precio_objetivo=1.5):
     df = df.copy()

@@ -1,6 +1,6 @@
 from lib.main_tipo import run_tipo
 
-TIPO = "quecochemecompro"  # 'ciudaddelautomovil' o 'quecochemecompro'
+TIPO = "ciudaddelautomovil"  # 'ciudaddelautomovil' o 'quecochemecompro'
 
 USAR_CSV_QUECOCHEMECOMPRO = True
 CSV_QUECOCHEMECOMPRO_PATH = "data/coches_quecochemecompro.csv"

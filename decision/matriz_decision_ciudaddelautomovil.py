@@ -1,84 +1,18 @@
 import pandas as pd
-from datetime import datetime
 
-
-# --------------------------------------------------
-# Normalizaciones
-# --------------------------------------------------
-
-def normalizar(col, minimizar=True):
-    col = col.astype(float)
-    denom = col.max() - col.min()
-    if denom == 0 or pd.isna(denom):
-        # Si todos los valores son iguales, devolver una serie neutra (1.0)
-        return pd.Series(1.0, index=col.index)
-
-    if minimizar:
-        return (col.max() - col) / denom
-    else:
-        return (col - col.min()) / denom
-
-def normalizar_objetivo(col, objetivo):
-    """
-    Score 1.0 si col <= objetivo
-    Penalización progresiva si lo supera
-    """
-    col = col.astype(float)
-
-    score = 1 - (col - objetivo) / objetivo
-    score[col <= objetivo] = 1.0
-
-    return score.clip(lower=0)
-
-
-def normalizar_edad(col_anio, edad_objetivo):
-    """
-    Convierte año -> edad y aplica normalización por objetivo
-    """
-    anio_actual = datetime.now().year
-    edad = (anio_actual - col_anio.astype(int)).clip(lower=1)
-
-    score = 1 - (edad - edad_objetivo) / edad_objetivo
-    score[edad <= edad_objetivo] = 1.0
-
-    return score.clip(lower=0)
-
-
-# --------------------------------------------------
-# Variables derivadas
-# --------------------------------------------------
-
-def calcular_km_anio_media(df):
-    edad = df["edad"] 
-    return df["Kilómetros"] / edad
-
-def calcular_edad(df):
-    """
-    Convierte año -> edad y aplica normalización por objetivo
-    """
-    anio_actual = datetime.now().year
-    return (anio_actual - df["Año"]).clip(lower=1)
-
-
-# --------------------------------------------------
-# Categóricos
-# --------------------------------------------------
-
-def mapear_categorico(df, columna, mapping, default=0.5):
-    return (
-        df[columna]
-        .astype(str)
-        .str.upper()
-        .map(mapping)
-        .fillna(default)
-        .astype(float)
-    )
+from .matriz_general import (
+    normalizar,
+    normalizar_objetivo,
+    normalizar_edad,
+    calcular_km_anio_media,
+    calcular_edad,
+    mapear_categorico,
+)
 
 
 # --------------------------------------------------
 # Score principal
 # --------------------------------------------------
-
 def calcular_score_ciudaddelautomovil(
     df,
     pesos,
