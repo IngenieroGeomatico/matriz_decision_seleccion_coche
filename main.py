@@ -1,131 +1,82 @@
-import pandas as pd
-from api.valor_mercado import obtener_valor_mercado_todos
-from decision.matriz_decision import calcular_score
+from lib.main_tipo import run_tipo
 
-# -----------------------------
-# 5️⃣ Definir pesos de la matriz de decisión
-# -----------------------------
-pesos = {
+TIPO = "usados"  # 'nuevos' o 'usados'
+
+USAR_CSV_NUEVOS = True
+CSV_NUEVOS_PATH = "data/coches_quecochemecompro.csv"
+USAR_CSV_USADOS = True
+CSV_USADOS_PATH = "data/coches_segunda_mano.csv"
+fiabilidad_path="data/fiabilidad_marcas.csv"
+
+pesos_nuevos = {
     "precio": 0.10,
     "consumo": 0.20,
     "potencia": 0.20,
     "etiqueta": 0.10,
     "fiabilidad": 0.40,
-    
+}
+
+pesos_usados = {
+    "precio": 0.20,
+    "kilometros": 0.10,
+    "anio": 0.10,
+    "km_anio": 0.10,
+    "potencia": 0.10,
+    "garantia": 0.10,
+    "combustible": 0.10,
+    "cambio": 0.10,
+    "fiabilidad": 0.10,
 }
 
 ETIQUETAS = {
-    "B": 0.1,
-    "C": 0.2,
-    "ECO": 0.50,
-    "0": 1.00,
+    "B": 0.1, 
+    "C": 0.2, 
+    "ECO": 0.50, 
+    "zero": 1.00, 
+    "0": 1.00, 
     "0 emisiones": 1.00
 }
 
-precio_objetivo=20000
-porc_mas_precio_objetivo = 1.5
-
-
-# -----------------------------
-# Configuración: origen de las especificaciones
-# -----------------------------
-USAR_CSV_PRECIOS = True
-CSV_PRECIOS_PATH = "data/coches_quecochemecompro.csv"
-
-# -----------------------------
-# 2️⃣ Cargar CSV de fiabilidad
-# -----------------------------
-fiabilidad_csv = pd.read_csv("data/fiabilidad_marcas.csv")
-# Diccionario con claves en minúsculas
-fiabilidad_dict = dict(zip(fiabilidad_csv.marca.str.lower(), fiabilidad_csv.fiabilidad))
-
-# -----------------------------
-# 3️⃣ Preparar dataset
-# -----------------------------
-dataset = []
-
-if not USAR_CSV_PRECIOS:
-    precio = obtener_valor_mercado_todos()   
-
-# Leer CSV con especificaciones
-df_precios = pd.read_csv(CSV_PRECIOS_PATH)
-# Crear diccionario {(marca, modelo, anio): specs}
-precios_dict = {
-    row.slug_version: row
-    for _, row in df_precios.iterrows()
+COMBUSTIBLE_SCORE = {
+    "ELÉCTRICO": 1.0,
+    "HÍBRIDO": 0.9,
+    "HÍBRIDO ENCHUFABLE": 0.85,
+    "GASOLINA": 0.7,
+    "DIÉSEL": 0.6,
+    "GLP": 0.65,
 }
 
+CAMBIO_SCORE = {
+    "AUTOMÁTICO": 1.0, 
+    "MANUAL": 0.7
+}
 
+GARANTIA = {
+    "Sí": 1.0, 
+    "No": 0.7
+}
 
-for coche in precios_dict:
-    c = precios_dict[coche]
+precio_objetivo = 10000
+porc_mas_precio_objetivo = 1.5
 
-    slug_version_lower = c["slug_version"].lower()
-    marca_lower = c["marca"].lower()
-    modelo_lower = c["modelo"].lower()
-    anio = c["anio"]
-    
-    precio_row = precios_dict.get(slug_version_lower)
+km_objetivo = 20000 * 3
+porc_km_objetivo = 1.5
 
-    precio = {
-        "nombre": precio_row.get("nombre"),
-        "marca": precio_row.get("marca"),
-        "modelo": precio_row.get("modelo"),
-        "slug_version": precio_row.get("slug_version"),
-        "precio": precio_row.get("precio"),
-        "combustible": precio_row.get("combustible"),
-        "potencia": precio_row.get("potencia"),
-        "consumo": precio_row.get("consumo"),
-        "anio": precio_row.get("anio"),
-        "etiqueta_medioambiental": precio_row.get("etiqueta_medioambiental"),
-        "url_version": precio_row.get("url_version")
-    }
-
-
-    dataset.append({
-        **c,
-        "consumo": precio.get("consumo"),
-        "potencia": precio.get("potencia"),
-        "nombre": precio.get("nombre"),
-        "marca": precio.get("marca"),
-        "modelo": precio.get("modelo"),
-        "slug_version": precio.get("slug_version"),
-        "precio": precio.get("precio"),
-        "combustible": precio.get("combustible"),
-        "potencia": precio.get("potencia"),
-        "consumo": precio.get("consumo"),
-        "anio": precio.get("anio"),
-        "etiqueta": precio.get("etiqueta_medioambiental"),
-        "fiabilidad": fiabilidad_dict.get(marca_lower, 0.6)
-    })
-
-# -----------------------------
-# 4️⃣ Crear DataFrame
-# -----------------------------
-df = pd.DataFrame(dataset)
-print(f"🚗 Coches listos para evaluación: {len(df)}")
-
-
-# -----------------------------
-# 6️⃣ Calcular score y ordenar
-# -----------------------------
-resultado = calcular_score(df, pesos,ETIQUETAS, precio_objetivo, porc_mas_precio_objetivo)
-resultado = resultado.sort_values("score", ascending=False).reset_index(drop=True)
-resultado.index += 1  # ahora empieza en 1
-columnas_mostrar = [
-    "nombre",
-    "marca",
-    "modelo",
-    "precio",
-    "etiqueta",
-    "fiabilidad",
-    "consumo",
-    "score"
-]
-
-print("🏆 Ranking coches nuevos según tus criterios:")
-print(resultado[columnas_mostrar].head(50))
-
-# 💾 Guardar en CSV
-resultado[columnas_mostrar].to_csv("data/ranking_coches.csv", index=True, index_label="ranking",encoding="utf-8")
-print("✅ CSV guardado en data/ranking_coches_nuevos.csv")
+resultado = run_tipo(
+    tipo=TIPO,
+    usar_csv_precios=USAR_CSV_NUEVOS,
+    csv_precios_path=CSV_NUEVOS_PATH,
+    usar_csv_usados=USAR_CSV_USADOS,
+    csv_usados_path=CSV_USADOS_PATH,
+    fiabilidad_path=fiabilidad_path,
+    pesos_nuevos=pesos_nuevos,
+    pesos_usados=pesos_usados,
+    ETIQUETAS=ETIQUETAS,
+    COMBUSTIBLE_SCORE=COMBUSTIBLE_SCORE,
+    CAMBIO_SCORE=CAMBIO_SCORE,
+    GARANTIA=GARANTIA,
+    precio_objetivo=precio_objetivo,
+    porc_mas_precio_objetivo=porc_mas_precio_objetivo,
+    km_objetivo=km_objetivo,
+    porc_km_objetivo = porc_km_objetivo,
+)
